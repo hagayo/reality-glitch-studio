@@ -92,6 +92,10 @@ http://localhost:8501
 
 התמונה מוגבלת לגודל מרבי כדי לשמור על זמן עיבוד וצריכת זיכרון סבירים.
 
+## Live Demo
+
+[Open Reality Glitch Studio](https://reality-glitch.streamlit.app)
+
 ## ארכיטקטורה
 
 ```text
