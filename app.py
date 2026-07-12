@@ -33,7 +33,7 @@ CONTAINER = build_container()
 
 st.set_page_config(
     page_title=APP_TITLE,
-    page_icon="🌀",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -57,17 +57,15 @@ def initialize_state() -> None:
         st.session_state.gif_signature = None
 
 
-def load_preset(name: str) -> None:
-    st.session_state.editor = EditorState.from_preset(
-        CONTAINER.presets.get(name)
-    )
-    st.session_state.preset_selector = name
-    clear_generated_gif()
-
-
 def clear_generated_gif() -> None:
     st.session_state.gif_data = None
     st.session_state.gif_signature = None
+
+
+def load_preset(name: str) -> None:
+    st.session_state.editor = EditorState.from_preset(CONTAINER.presets.get(name))
+    st.session_state.preset_selector = name
+    clear_generated_gif()
 
 
 def choose_random_preset() -> None:
@@ -85,8 +83,8 @@ def reset_editor() -> None:
 
 def build_pipeline_summary(steps: list[EffectStep]) -> str:
     if not steps:
-        return "לא נבחרו אפקטים"
-    return " ← ".join(DISPLAY_NAMES[step.effect_id] for step in steps)
+        return "בחרו לפחות אפקט אחד"
+    return "  ◀  ".join(DISPLAY_NAMES[step.effect_id] for step in steps)
 
 
 def build_render_signature(
@@ -108,18 +106,53 @@ def render_header() -> None:
 
     st.markdown(
         f"""
-        <section class="hero-shell">
-            <div class="hero-copy">
-                <span class="eyebrow">CREATIVE PYTHON LAB</span>
-                <h1>{APP_TITLE}</h1>
-                <p>מעלים תמונה, בונים שרשרת אפקטים ומפיקים יצירה חדשה בזמן אמת.</p>
+        <section class="energy-hero">
+            <div class="hero-orb orb-one"></div>
+            <div class="hero-orb orb-two"></div>
+            <div class="energy-copy">
+                <span class="energy-kicker">PYTHON CREATIVE PLAYGROUND</span>
+                <h1>Reality Glitch <em>Studio</em></h1>
+                <p>הופכים תמונה רגילה ליצירה חיה, מפתיעה ומונפשת.</p>
+                <div class="hero-pills">
+                    <span>{effect_count} אפקטים</span>
+                    <span>{preset_count} סגנונות</span>
+                    <span>PNG</span>
+                    <span>GIF</span>
+                </div>
             </div>
-            <div class="hero-stats">
-                <div class="stat-card"><strong>{effect_count}</strong><span>אפקטים</span></div>
-                <div class="stat-card"><strong>{preset_count}</strong><span>Presets</span></div>
-                <div class="stat-card"><strong>PNG + GIF</strong><span>יצוא</span></div>
-            </div>
+            <div class="hero-spark">⚡</div>
         </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_sidebar_header() -> None:
+    st.markdown(
+        """
+        <div class="sidebar-brand">
+            <div class="brand-mark">R</div>
+            <div>
+                <strong>Reality Glitch</strong>
+                <span>יוצרים בארבעה צעדים</span>
+            </div>
+        </div>
+        <div class="start-here">
+            <span class="start-dot"></span>
+            מתחילים כאן - העלו תמונה
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_section_heading(number: int, title: str, subtitle: str) -> None:
+    st.markdown(
+        f"""
+        <div class="control-heading">
+            <span>{number}</span>
+            <div><strong>{title}</strong><small>{subtitle}</small></div>
+        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -128,46 +161,68 @@ def render_header() -> None:
 def render_empty_state() -> None:
     st.markdown(
         """
-        <section class="empty-state">
-            <div class="empty-icon">✦</div>
-            <h2>הסטודיו מוכן</h2>
-            <p>העלו תמונה מהסרגל הצדדי ובחרו Preset להתחלה מהירה.</p>
+        <section class="launch-zone">
+            <div class="launch-symbol">↥</div>
+            <div>
+                <span class="launch-label">הצעד הראשון</span>
+                <h2>העלו תמונה מהפאנל הצבעוני</h2>
+                <p>משם אפשר לבחור סגנון מוכן או להרכיב Pipeline אישי.</p>
+            </div>
         </section>
         """,
         unsafe_allow_html=True,
     )
 
-    first, second, third = st.columns(3)
-    with first:
-        st.markdown(
-            '<div class="feature-card"><b>1. מעלים</b><span>JPG, PNG או WEBP</span></div>',
-            unsafe_allow_html=True,
-        )
-    with second:
-        st.markdown(
-            '<div class="feature-card"><b>2. מעצבים</b><span>Preset או Pipeline אישי</span></div>',
-            unsafe_allow_html=True,
-        )
-    with third:
-        st.markdown(
-            '<div class="feature-card"><b>3. מורידים</b><span>תמונה או אנימציה</span></div>',
-            unsafe_allow_html=True,
-        )
+    cards = [
+        ("01", "מעלים", "JPG, PNG או WEBP"),
+        ("02", "משנים", "Preset או אפקטים אישיים"),
+        ("03", "מנפישים", "GIF חי בלחיצה"),
+        ("04", "מורידים", "PNG או GIF"),
+    ]
+    columns = st.columns(4)
+    for column, (number, title, text) in zip(columns, cards):
+        with column:
+            st.markdown(
+                f"""
+                <div class="journey-card">
+                    <span>{number}</span><strong>{title}</strong><small>{text}</small>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 
 def render_sidebar() -> tuple[Any, EditorState, bool]:
     editor: EditorState = st.session_state.editor
 
     with st.sidebar:
-        st.markdown('<div class="sidebar-title">לוח הבקרה</div>', unsafe_allow_html=True)
+        render_sidebar_header()
 
+        render_section_heading(1, "תמונה", "בחרו חומר גלם")
         uploaded_file = st.file_uploader(
-            "בחירת תמונה",
+            "העלאת תמונה",
             type=["jpg", "jpeg", "png", "webp"],
-            help="התמונה מוקטנת אוטומטית כדי לשמור על ביצועים טובים בענן.",
+            help="התמונה מוקטנת אוטומטית לשמירה על ביצועים בענן.",
+            label_visibility="collapsed",
         )
 
-        st.markdown("#### התחלה מהירה")
+        render_section_heading(2, "סגנון", "קיצור דרך לתוצאה חזקה")
+        preset_names = [preset.name for preset in CONTAINER.presets.list_all()]
+        st.selectbox(
+            "Preset",
+            preset_names,
+            key="preset_selector",
+            label_visibility="collapsed",
+        )
+        if st.button(
+            "הפעלת הסגנון",
+            type="primary",
+            use_container_width=True,
+            key="apply_preset",
+        ):
+            load_preset(st.session_state.preset_selector)
+            st.rerun()
+
         quick_left, quick_right = st.columns(2)
         with quick_left:
             if st.button("הפתע אותי", use_container_width=True):
@@ -178,26 +233,15 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
                 reset_editor()
                 st.rerun()
 
-        preset_names = [preset.name for preset in CONTAINER.presets.list_all()]
-        st.selectbox(
-            "Preset",
-            preset_names,
-            key="preset_selector",
-        )
-        if st.button("הפעלת ה-Preset", type="primary", use_container_width=True):
-            load_preset(st.session_state.preset_selector)
-            st.rerun()
-
-        st.divider()
-        st.markdown("#### בניית Pipeline")
-
+        render_section_heading(3, "אפקטים", "בנו רצף משלכם")
         selected_ids = st.multiselect(
             "אפקטים לפי סדר הפעלה",
             list(EffectId),
             default=[step.effect_id for step in editor.steps],
-            max_selections=4,
+            max_selections=6,
             format_func=DISPLAY_NAMES.get,
             help="סדר הבחירה הוא סדר הפעלת האפקטים.",
+            label_visibility="collapsed",
         )
 
         existing = {step.effect_id: step for step in editor.steps}
@@ -210,7 +254,7 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
         ]
 
         st.markdown(
-            f'<div class="pipeline-box">{build_pipeline_summary(steps)}</div>',
+            f'<div class="pipeline-ribbon">{build_pipeline_summary(steps)}</div>',
             unsafe_allow_html=True,
         )
 
@@ -219,8 +263,7 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
             for index, step in enumerate(steps)
         ]
 
-        st.divider()
-        st.markdown("#### גימור")
+        render_section_heading(4, "גימור", "הטאץ׳ האחרון")
         contrast = st.slider(
             "ניגודיות",
             0.5,
@@ -241,6 +284,16 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
         )
         st.session_state.show_pipeline_steps = show_steps
 
+        st.markdown(
+            """
+            <div class="sidebar-tip">
+                <b>טיפ</b>
+                התחילו מ-Preset, ואז שנו רק אפקט אחד בכל פעם.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         editor.steps = edited_steps
         editor.finish = FinishSettings(contrast, color)
 
@@ -249,49 +302,89 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
 
 def render_image_metadata(original: Image.Image, step_count: int) -> None:
     width, height = original.size
-    first, second, third = st.columns(3)
-    first.metric("רזולוציה", f"{width} × {height}")
-    second.metric("שלבים", step_count)
-    third.metric("מצב צבע", original.mode)
+    cards = [
+        ("רזולוציה", f"{width} × {height}"),
+        ("Pipeline", f"{step_count} שלבים"),
+        ("צבע", original.mode),
+    ]
+    columns = st.columns(3)
+    for column, (label, value) in zip(columns, cards):
+        with column:
+            st.markdown(
+                f"""
+                <div class="info-tile"><span>{label}</span><strong>{value}</strong></div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 
-def render_studio_tab(original: Image.Image, result_image: Image.Image) -> None:
+def render_studio(original: Image.Image, result_image: Image.Image) -> None:
+    st.markdown(
+        '<div class="section-banner"><span>LIVE PREVIEW</span><h2>לפני ואחרי</h2></div>',
+        unsafe_allow_html=True,
+    )
     source_column, result_column = st.columns(2, gap="large")
     with source_column:
-        st.markdown("#### המקור")
+        st.markdown('<div class="image-label source">מקור</div>', unsafe_allow_html=True)
         st.image(original, use_container_width=True)
     with result_column:
-        st.markdown("#### התוצאה")
+        st.markdown('<div class="image-label result">תוצאה</div>', unsafe_allow_html=True)
         st.image(result_image, use_container_width=True)
 
 
-def render_steps_tab(result_steps: tuple[Any, ...]) -> None:
+def render_steps(result_steps: tuple[Any, ...]) -> None:
+    st.markdown(
+        '<div class="section-banner compact"><span>PIPELINE</span><h2>איך נבנתה התוצאה</h2></div>',
+        unsafe_allow_html=True,
+    )
     if not result_steps:
-        st.info("לא נשמרו שלבי ביניים להרצה הזו.")
+        st.info("הפעילו 'הצגת שלבי ביניים' בפאנל כדי לראות כל שלב.")
         return
 
     columns = st.columns(min(3, len(result_steps)))
     for index, step_result in enumerate(result_steps):
         with columns[index % len(columns)]:
             st.markdown(
-                f'<div class="step-number">שלב {index + 1}</div>',
+                f"""
+                <div class="step-card-title">
+                    <span>{index + 1}</span>
+                    <strong>{DISPLAY_NAMES[step_result.effect_id]}</strong>
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
-            st.caption(DISPLAY_NAMES[step_result.effect_id])
             st.image(step_result.image, use_container_width=True)
 
 
-def render_export_tab(
+def render_export_center(
     original: Image.Image,
     result_image: Image.Image,
     editor: EditorState,
     uploaded_bytes: bytes,
 ) -> None:
-    png_column, gif_column = st.columns(2, gap="large")
+    st.markdown(
+        """
+        <div class="export-hero">
+            <div><span>READY TO SHARE</span><h2>מורידים תמונה או מנפישים אותה</h2></div>
+            <div class="export-badge">PNG + GIF</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    png_column, gif_column = st.columns([0.8, 1.2], gap="large")
 
     with png_column:
-        st.markdown("### תמונה סטטית")
-        st.caption("הורדה מידית באיכות התוצאה המוצגת.")
+        st.markdown(
+            """
+            <div class="download-copy">
+                <span class="download-icon">▣</span>
+                <h3>תמונה סטטית</h3>
+                <p>התוצאה המדויקת שמופיעה בתצוגה.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         st.download_button(
             "הורדת PNG",
             CONTAINER.exporter.to_png(result_image),
@@ -302,41 +395,67 @@ def render_export_tab(
         )
 
     with gif_column:
-        st.markdown("### אנימציה")
-        frame_count = st.slider(
-            "מספר פריימים",
-            5,
-            24,
-            12,
-            key="gif_frame_count",
+        st.markdown(
+            """
+            <div class="download-copy gif-copy">
+                <span class="download-icon">▶</span>
+                <h3>GIF מונפש</h3>
+                <p>האפקטים נבנים בהדרגה וחוזרים בלולאה.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-        frame_duration = st.slider(
-            "משך פריים במילישניות",
-            50,
-            300,
-            90,
-            10,
-            key="gif_frame_duration",
-        )
+        settings_left, settings_right = st.columns(2)
+        with settings_left:
+            frame_count = st.slider(
+                "מספר פריימים",
+                5,
+                24,
+                12,
+                key="gif_frame_count",
+            )
+        with settings_right:
+            frame_duration = st.slider(
+                "מהירות",
+                50,
+                300,
+                90,
+                10,
+                key="gif_frame_duration",
+                help="מספר נמוך יותר יוצר אנימציה מהירה יותר.",
+            )
 
         options = AnimationOptions(frame_count, frame_duration)
         request = PipelineRequest(tuple(editor.steps), editor.finish)
         signature = build_render_signature(uploaded_bytes, request, options)
 
-        if st.button("יצירת GIF", use_container_width=True):
-            with st.spinner("יוצר את האנימציה..."):
-                st.session_state.gif_data = CONTAINER.animation.render_gif(
-                    original,
-                    request,
-                    options,
-                )
-                st.session_state.gif_signature = signature
+        create_clicked = st.button(
+            "⚡ יצירת GIF עכשיו",
+            type="primary",
+            use_container_width=True,
+            key="create_gif",
+        )
+        if create_clicked:
+            try:
+                with st.spinner("מייצר את האנימציה המלאה..."):
+                    st.session_state.gif_data = CONTAINER.animation.render_gif(
+                        original,
+                        request,
+                        options,
+                    )
+                    st.session_state.gif_signature = signature
+            except (RealityGlitchError, OSError, ValueError) as error:
+                LOGGER.exception("Failed to generate GIF")
+                st.error("לא הצלחנו ליצור את ה-GIF.")
+                with st.expander("פרטי השגיאה"):
+                    st.code(str(error))
 
         if (
             st.session_state.gif_data is not None
             and st.session_state.gif_signature == signature
         ):
-            st.image(st.session_state.gif_data)
+            st.success("ה-GIF מוכן")
+            st.image(st.session_state.gif_data, use_container_width=True)
             st.download_button(
                 "הורדת GIF",
                 st.session_state.gif_data,
@@ -346,7 +465,7 @@ def render_export_tab(
                 use_container_width=True,
             )
         elif st.session_state.gif_data is not None:
-            st.info("ההגדרות השתנו. צרו מחדש את ה-GIF כדי לעדכן אותו.")
+            st.warning("שיניתם הגדרות. לחצו שוב על יצירת GIF כדי לרענן אותו.")
 
 
 def main() -> None:
@@ -359,13 +478,13 @@ def main() -> None:
         render_empty_state()
         return
     if not editor.steps:
-        st.warning("יש לבחור לפחות אפקט אחד.")
+        st.warning("יש לבחור לפחות אפקט אחד בפאנל השמאלי.")
         return
 
     uploaded_bytes = uploaded_file.getvalue()
 
     try:
-        with st.spinner("מעבד את התמונה..."):
+        with st.spinner("הסטודיו מעבד את התמונה..."):
             original = CONTAINER.image_service.prepare(Image.open(uploaded_file))
             request = PipelineRequest(
                 steps=tuple(editor.steps),
@@ -375,7 +494,7 @@ def main() -> None:
             result = CONTAINER.pipeline.execute(original, request)
     except (RealityGlitchError, UnidentifiedImageError, OSError, ValueError) as error:
         LOGGER.exception("Failed to process image")
-        st.error("לא הצלחנו לעבד את התמונה. בדקו שהקובץ וההגדרות תקינים.")
+        st.error("לא הצלחנו לעבד את התמונה. בדקו את הקובץ וההגדרות.")
         with st.expander("פרטי השגיאה"):
             st.code(str(error))
         return
@@ -383,17 +502,18 @@ def main() -> None:
     render_image_metadata(original, len(editor.steps))
 
     studio_tab, steps_tab, export_tab = st.tabs(
-        ["סטודיו", "שלבי Pipeline", "הורדה ו-GIF"]
+        ["⚡ הסטודיו", "◉ שלבי היצירה", "↗ יצוא ו-GIF"]
     )
 
     with studio_tab:
-        render_studio_tab(original, result.image)
+        render_studio(original, result.image)
+        st.markdown('<div class="quick-export-line">התוצאה מוכנה - עברו לטאב יצוא ו-GIF כדי להוריד או להנפיש.</div>', unsafe_allow_html=True)
 
     with steps_tab:
-        render_steps_tab(result.steps)
+        render_steps(result.steps)
 
     with export_tab:
-        render_export_tab(
+        render_export_center(
             original,
             result.image,
             editor,
