@@ -199,12 +199,24 @@ def apply_styles() -> None:
                 background: #0b4a56 !important;
                 border-color: rgba(255,255,255,.28) !important;
             }
+            /* Form fields use light backgrounds, so their entered/selected text is navy. */
+            input,
+            textarea {
+                color: navy !important;
+                -webkit-text-fill-color: navy !important;
+                opacity: 1 !important;
+            }
             [data-testid="stSidebar"] input,
             [data-testid="stSidebar"] textarea,
+            [data-testid="stSidebar"] [data-baseweb="input"] input,
+            [data-testid="stSidebar"] [data-baseweb="base-input"] input,
+            [data-testid="stSidebar"] [role="combobox"],
+            [data-testid="stSidebar"] [role="combobox"] *,
             [data-testid="stSidebar"] [data-baseweb="select"] span,
-            [data-testid="stSidebar"] [data-baseweb="select"] div {
-                color: #f7fffd !important;
-                -webkit-text-fill-color: #f7fffd !important;
+            [data-testid="stSidebar"] [data-baseweb="select"] p {
+                color: navy !important;
+                -webkit-text-fill-color: navy !important;
+                opacity: 1 !important;
             }
             [data-testid="stSidebar"] input::placeholder,
             [data-testid="stSidebar"] textarea::placeholder {
@@ -245,6 +257,14 @@ def apply_styles() -> None:
                 color: #062f39 !important;
                 background: var(--yellow) !important;
             }
+
+            [data-testid="stSidebar"] [data-baseweb="input"] > div,
+            [data-testid="stSidebar"] [data-baseweb="base-input"],
+            [data-testid="stSidebar"] [data-baseweb="textarea"] > div {
+                background: #ffffff !important;
+                color: navy !important;
+            }
+
             /* Selectboxes use a light field, so their selected value must be dark. */
             [data-testid="stSidebar"] div[data-baseweb="select"] > div {
                 background: #ffffff !important;
@@ -257,6 +277,16 @@ def apply_styles() -> None:
                 -webkit-text-fill-color: #082f3b !important;
                 opacity: 1 !important;
             }
+
+            [data-testid="stSidebar"] [role="combobox"],
+            [data-testid="stSidebar"] [role="combobox"] div,
+            [data-testid="stSidebar"] [role="combobox"] span,
+            [data-testid="stSidebar"] [role="combobox"] p {
+                color: navy !important;
+                -webkit-text-fill-color: navy !important;
+                opacity: 1 !important;
+            }
+
             [data-testid="stSidebar"] div[data-baseweb="select"] svg {
                 fill: #082f3b !important;
                 color: #082f3b !important;
