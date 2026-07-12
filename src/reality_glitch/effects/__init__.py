@@ -1,12 +1,14 @@
 from reality_glitch.effects.center_bulge import CenterBulgeEffect
 from reality_glitch.effects.center_pinch import CenterPinchEffect
 from reality_glitch.effects.circular_ripple import CircularRippleEffect
+from reality_glitch.effects.double_exposure import DoubleExposureEffect
 from reality_glitch.effects.glitch import GlitchEffect
 from reality_glitch.effects.grayscale import GrayscaleEffect
 from reality_glitch.effects.kaleidoscope import KaleidoscopeEffect
 from reality_glitch.effects.local_twirl import LocalTwirlEffect
 from reality_glitch.effects.mirror import MirrorEffect
 from reality_glitch.effects.mosaic import MosaicEffect
+from reality_glitch.effects.palette_transplant import PaletteTransplantEffect
 from reality_glitch.effects.pixel_sort import PixelSortEffect
 from reality_glitch.effects.portal import PortalEffect
 from reality_glitch.effects.retro_crt import RetroCrtEffect
@@ -18,12 +20,14 @@ __all__ = [
     "CenterBulgeEffect",
     "CenterPinchEffect",
     "CircularRippleEffect",
+    "DoubleExposureEffect",
     "GlitchEffect",
     "GrayscaleEffect",
     "KaleidoscopeEffect",
     "LocalTwirlEffect",
     "MirrorEffect",
     "MosaicEffect",
+    "PaletteTransplantEffect",
     "PixelSortEffect",
     "PortalEffect",
     "RetroCrtEffect",

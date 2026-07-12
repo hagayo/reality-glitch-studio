@@ -4,12 +4,14 @@ from reality_glitch.effects import (
     CenterBulgeEffect,
     CenterPinchEffect,
     CircularRippleEffect,
+    DoubleExposureEffect,
     GlitchEffect,
     GrayscaleEffect,
     KaleidoscopeEffect,
     LocalTwirlEffect,
     MirrorEffect,
     MosaicEffect,
+    PaletteTransplantEffect,
     PixelSortEffect,
     PortalEffect,
     RetroCrtEffect,
@@ -57,6 +59,8 @@ def build_container() -> ApplicationContainer:
             CenterBulgeEffect(),
             CenterPinchEffect(),
             LocalTwirlEffect(),
+            DoubleExposureEffect(),
+            PaletteTransplantEffect(),
         )
     )
     image_service = PillowImageService(max_size=1200)

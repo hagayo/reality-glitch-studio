@@ -11,7 +11,7 @@ def test_repository_returns_known_presets() -> None:
     repository = InMemoryPresetRepository()
 
     assert repository.get("Cyber Pulse").name == "Cyber Pulse"
-    assert len(repository.list_all()) >= 30
+    assert len(repository.list_all()) >= 32
 
 
 def test_repository_reports_unknown_preset() -> None:
@@ -77,6 +77,8 @@ def test_preset_settings_are_not_shared_between_steps() -> None:
         "Bubble Portrait",
         "Implosion",
         "Twirl Focus",
+        "Ghost Merge",
+        "Palette Dream",
     ],
 )
 def test_style_presets_exist(preset_name: str) -> None:

@@ -21,6 +21,8 @@ class EffectId(StrEnum):
     CENTER_BULGE = "center_bulge"
     CENTER_PINCH = "center_pinch"
     LOCAL_TWIRL = "local_twirl"
+    DOUBLE_EXPOSURE = "double_exposure"
+    PALETTE_TRANSPLANT = "palette_transplant"
 
 
 class MirrorMode(StrEnum):
@@ -82,9 +84,20 @@ class AnimationOptions:
     frame_count: int = 12
     frame_duration_ms: int = 90
     ping_pong: bool = True
+    mode: str = "ping_pong"
+    animated_step_index: int = 0
+    animated_parameter: str = ""
+    parameter_swing: float = 0.35
+    waveform: str = "sine"
 
     def __post_init__(self) -> None:
         if self.frame_count < 2:
             raise ValueError("frame_count must be at least 2")
         if self.frame_duration_ms < 20:
             raise ValueError("frame_duration_ms must be at least 20")
+        if self.mode not in {"ping_pong", "build_up", "parameter"}:
+            raise ValueError("mode must be ping_pong, build_up, or parameter")
+        if self.parameter_swing < 0:
+            raise ValueError("parameter_swing must be non-negative")
+        if self.waveform not in {"sine"}:
+            raise ValueError("waveform must be sine")

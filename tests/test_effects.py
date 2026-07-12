@@ -8,12 +8,14 @@ from reality_glitch.effects import (
     CenterBulgeEffect,
     CenterPinchEffect,
     CircularRippleEffect,
+    DoubleExposureEffect,
     GlitchEffect,
     GrayscaleEffect,
     KaleidoscopeEffect,
     LocalTwirlEffect,
     MirrorEffect,
     MosaicEffect,
+    PaletteTransplantEffect,
     PixelSortEffect,
     PortalEffect,
     RetroCrtEffect,
@@ -39,6 +41,8 @@ EFFECT_CASES = [
     (CenterBulgeEffect(), {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 0.8, "falloff": 1.8}),
     (CenterPinchEffect(), {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 0.8, "falloff": 1.8}),
     (LocalTwirlEffect(), {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 2.5, "falloff": 1.6}),
+    (DoubleExposureEffect(), {"source_image": Image.new("RGB", (8, 8), "blue"), "opacity": 0.4, "channel_shift": 2, "mix_mode": "screen"}),
+    (PaletteTransplantEffect(), {"palette_image": Image.new("RGB", (8, 8), "blue"), "mode": "gradient", "gradient_contrast": 1.1}),
 ]
 
 
@@ -288,3 +292,13 @@ def test_local_twirl_zero_strength_is_identity(rgb_image: Image.Image) -> None:
 def test_local_twirl_rejects_invalid_radius(radius: float, rgb_image: Image.Image) -> None:
     with pytest.raises(ValueError, match="radius"):
         LocalTwirlEffect().apply(rgb_image, {"radius": radius})
+
+
+def test_double_exposure_requires_source_image(rgb_image: Image.Image) -> None:
+    with pytest.raises(ValueError, match="source_image"):
+        DoubleExposureEffect().apply(rgb_image, {"opacity": 0.5})
+
+
+def test_palette_transplant_requires_palette_image(rgb_image: Image.Image) -> None:
+    with pytest.raises(ValueError, match="palette_image"):
+        PaletteTransplantEffect().apply(rgb_image, {"mode": "gradient"})

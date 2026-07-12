@@ -24,6 +24,8 @@ DISPLAY_NAMES = {
     EffectId.CENTER_BULGE: "ניפוח מרכזי",
     EffectId.CENTER_PINCH: "כיווץ מרכזי",
     EffectId.LOCAL_TWIRL: "סחרור מקומי",
+    EffectId.DOUBLE_EXPOSURE: "Double Exposure",
+    EffectId.PALETTE_TRANSPLANT: "Palette Transplant",
 }
 
 DEFAULT_SETTINGS: dict[EffectId, dict[str, Any]] = {
@@ -83,6 +85,17 @@ DEFAULT_SETTINGS: dict[EffectId, dict[str, Any]] = {
         "radius": 30.0,
         "strength": 3.0,
         "falloff": 1.6,
+    },
+    EffectId.DOUBLE_EXPOSURE: {
+        "source_slot": "blend",
+        "opacity": 0.45,
+        "channel_shift": 8,
+        "mix_mode": "screen",
+    },
+    EffectId.PALETTE_TRANSPLANT: {
+        "source_slot": "palette",
+        "mode": "gradient",
+        "gradient_contrast": 1.15,
     },
 }
 
@@ -393,6 +406,61 @@ def render_effect_settings(step: EffectStep, index: int) -> EffectStep:
                 float(settings.get("falloff", 1.8)),
                 0.1,
                 key=f"{prefix}_falloff",
+            )
+
+        elif step.effect_id is EffectId.DOUBLE_EXPOSURE:
+            settings["source_slot"] = st.selectbox(
+                "תמונת מקור",
+                ["blend", "palette"],
+                index=0 if settings.get("source_slot", "blend") == "blend" else 1,
+                key=f"{prefix}_source_slot_de",
+                format_func=lambda value: "תמונת מיזוג" if value == "blend" else "תמונת פלטה",
+            )
+            settings["mix_mode"] = st.selectbox(
+                "סוג מיזוג",
+                ["screen", "blend", "add"],
+                index=["screen", "blend", "add"].index(str(settings.get("mix_mode", "screen"))),
+                key=f"{prefix}_mix_mode",
+                format_func=lambda value: {"screen": "Screen", "blend": "Blend", "add": "Add"}[value],
+            )
+            settings["opacity"] = st.slider(
+                "עוצמת מיזוג",
+                0.0,
+                1.0,
+                float(settings.get("opacity", 0.45)),
+                0.05,
+                key=f"{prefix}_opacity",
+            )
+            settings["channel_shift"] = st.slider(
+                "היסט ערוצים",
+                0,
+                40,
+                int(settings.get("channel_shift", 8)),
+                key=f"{prefix}_channel_shift_de",
+            )
+
+        elif step.effect_id is EffectId.PALETTE_TRANSPLANT:
+            settings["source_slot"] = st.selectbox(
+                "תמונת פלטה",
+                ["palette", "blend"],
+                index=0 if settings.get("source_slot", "palette") == "palette" else 1,
+                key=f"{prefix}_source_slot_pt",
+                format_func=lambda value: "תמונת פלטה" if value == "palette" else "תמונת מיזוג",
+            )
+            settings["mode"] = st.selectbox(
+                "סוג מיפוי צבע",
+                ["gradient", "duotone"],
+                index=0 if settings.get("mode", "gradient") == "gradient" else 1,
+                key=f"{prefix}_palette_mode",
+                format_func=lambda value: "Gradient" if value == "gradient" else "Duotone",
+            )
+            settings["gradient_contrast"] = st.slider(
+                "עוצמת מיפוי",
+                0.5,
+                2.5,
+                float(settings.get("gradient_contrast", 1.15)),
+                0.05,
+                key=f"{prefix}_gradient_contrast",
             )
 
     return EffectStep(step.effect_id, settings)

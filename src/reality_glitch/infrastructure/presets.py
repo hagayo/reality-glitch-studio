@@ -373,4 +373,24 @@ class InMemoryPresetRepository:
                 ),
                 finish=FinishSettings(contrast=1.1, color=1.25),
             ),
+            Preset(
+                name="Ghost Merge",
+                steps=(
+                    EffectStep(
+                        EffectId.DOUBLE_EXPOSURE,
+                        {"source_slot": "blend", "opacity": 0.45, "channel_shift": 8, "mix_mode": "screen"},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.05, color=1.12),
+            ),
+            Preset(
+                name="Palette Dream",
+                steps=(
+                    EffectStep(
+                        EffectId.PALETTE_TRANSPLANT,
+                        {"source_slot": "palette", "mode": "gradient", "gradient_contrast": 1.2},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.08, color=1.0),
+            ),
         )

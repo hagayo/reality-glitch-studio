@@ -179,6 +179,53 @@ def build_render_signature(
     return hashlib.sha256(payload).hexdigest()
 
 
+def prepare_optional_image(uploaded_file: Any) -> Image.Image | None:
+    if uploaded_file is None:
+        return None
+    return CONTAINER.image_service.prepare(Image.open(uploaded_file))
+
+
+def resolve_source_image(slot: str, blend_image: Image.Image | None, palette_image: Image.Image | None) -> Image.Image | None:
+    if slot == "palette":
+        return palette_image or blend_image
+    return blend_image or palette_image
+
+
+def materialize_steps(
+    steps: tuple[EffectStep, ...] | list[EffectStep],
+    blend_image: Image.Image | None,
+    palette_image: Image.Image | None,
+) -> tuple[EffectStep, ...]:
+    materialized: list[EffectStep] = []
+    for step in steps:
+        settings = dict(step.settings)
+        if step.effect_id is EffectId.DOUBLE_EXPOSURE:
+            source_image = resolve_source_image(
+                str(settings.get("source_slot", "blend")),
+                blend_image,
+                palette_image,
+            )
+            settings["source_image"] = source_image
+        elif step.effect_id is EffectId.PALETTE_TRANSPLANT:
+            palette_source = resolve_source_image(
+                str(settings.get("source_slot", "palette")),
+                blend_image,
+                palette_image,
+            )
+            settings["palette_image"] = palette_source
+        materialized.append(EffectStep(step.effect_id, settings))
+    return tuple(materialized)
+
+
+def numeric_setting_options(steps: list[EffectStep]) -> list[tuple[str, int, str]]:
+    options: list[tuple[str, int, str]] = []
+    for index, step in enumerate(steps):
+        for key, value in step.settings.items():
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                options.append((f"{index + 1}. {DISPLAY_NAMES[step.effect_id]} / {key}", index, key))
+    return options
+
+
 def render_header() -> None:
     effect_count = len(CONTAINER.registry.list_definitions())
     preset_count = len(CONTAINER.presets.list_all())
@@ -271,7 +318,7 @@ def render_empty_state() -> None:
             )
 
 
-def render_sidebar() -> tuple[Any, EditorState, bool]:
+def render_sidebar() -> tuple[Any, Any, Any, EditorState, bool]:
     editor: EditorState = st.session_state.editor
 
     with st.sidebar:
@@ -283,6 +330,21 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
             type=["jpg", "jpeg", "png", "webp"],
             help="התמונה מוקטנת אוטומטית לשמירה על ביצועים בענן.",
             label_visibility="collapsed",
+            key="base_image_uploader",
+        )
+        source_blend_file = st.file_uploader(
+            "תמונת מיזוג אופציונלית",
+            type=["jpg", "jpeg", "png", "webp"],
+            help="משמשת ל-Double Exposure או כמקור צבעים חלופי.",
+            label_visibility="visible",
+            key="blend_image_uploader",
+        )
+        source_palette_file = st.file_uploader(
+            "תמונת פלטה אופציונלית",
+            type=["jpg", "jpeg", "png", "webp"],
+            help="משמשת ל-Palette Transplant או כמקור נוסף לאפקטים משולבים.",
+            label_visibility="visible",
+            key="palette_image_uploader",
         )
 
         quick_left, quick_right = st.columns(2)
@@ -382,7 +444,7 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
             editor.active_preset = "מותאם אישית" if edited_steps != list(CONTAINER.presets.get(editor.active_preset).steps) else editor.active_preset
         editor.finish = FinishSettings(contrast, color)
 
-    return uploaded_file, editor, show_steps
+    return uploaded_file, source_blend_file, source_palette_file, editor, show_steps
 
 
 def render_image_metadata(original: Image.Image, step_count: int) -> None:
@@ -446,6 +508,10 @@ def render_export_center(
     result_image: Image.Image,
     editor: EditorState,
     uploaded_bytes: bytes,
+    blend_bytes: bytes,
+    palette_bytes: bytes,
+    blend_image: Image.Image | None,
+    palette_image: Image.Image | None,
 ) -> None:
     st.markdown(
         """
@@ -495,7 +561,7 @@ def render_export_center(
             frame_count = st.slider(
                 "מספר פריימים",
                 5,
-                24,
+                36,
                 12,
                 key="gif_frame_count",
             )
@@ -510,9 +576,63 @@ def render_export_center(
                 help="מספר נמוך יותר יוצר אנימציה מהירה יותר.",
             )
 
-        options = AnimationOptions(frame_count, frame_duration)
-        request = PipelineRequest(tuple(editor.steps), editor.finish)
-        signature = build_render_signature(uploaded_bytes, request, options)
+        animation_mode = st.radio(
+            "סוג אנימציה",
+            ["ping_pong", "build_up", "parameter"],
+            horizontal=True,
+            format_func=lambda value: {
+                "ping_pong": "Ping-Pong",
+                "build_up": "Build-Up",
+                "parameter": "פרמטר מרקד",
+            }[value],
+            key="animation_mode",
+        )
+
+        animated_step_index = 0
+        animated_parameter = ""
+        parameter_swing = 0.35
+        if animation_mode == "parameter":
+            numeric_options = numeric_setting_options(editor.steps)
+            if numeric_options:
+                option_labels = [label for label, _, _ in numeric_options]
+                selected_label = st.selectbox(
+                    "איזה פרמטר להנפיש",
+                    option_labels,
+                    key="animated_parameter_selector",
+                )
+                selected_tuple = next(item for item in numeric_options if item[0] == selected_label)
+                _, animated_step_index, animated_parameter = selected_tuple
+                parameter_swing = st.slider(
+                    "טווח תנודה",
+                    0.05,
+                    1.0,
+                    0.35,
+                    0.05,
+                    key="parameter_swing",
+                    help="כמה הפרמטר ינוע סביב הערך המקורי שלו.",
+                )
+            else:
+                st.info("אין כרגע פרמטרים מספריים שאפשר להנפיש.")
+                animation_mode = "ping_pong"
+
+        options = AnimationOptions(
+            frame_count=frame_count,
+            frame_duration_ms=frame_duration,
+            ping_pong=True,
+            mode=animation_mode,
+            animated_step_index=animated_step_index,
+            animated_parameter=animated_parameter,
+            parameter_swing=parameter_swing,
+        )
+        request = PipelineRequest(
+            materialize_steps(tuple(editor.steps), blend_image, palette_image),
+            editor.finish,
+        )
+        signature = build_render_signature(
+            uploaded_bytes + blend_bytes + palette_bytes,
+            request,
+            options,
+        )
 
         create_clicked = st.button(
             "⚡ יצירת GIF עכשיו",
@@ -558,7 +678,7 @@ def main() -> None:
     apply_styles()
     render_header()
 
-    uploaded_file, editor, show_steps = render_sidebar()
+    uploaded_file, source_blend_file, source_palette_file, editor, show_steps = render_sidebar()
     if uploaded_file is None:
         render_empty_state()
         return
@@ -567,12 +687,16 @@ def main() -> None:
         return
 
     uploaded_bytes = uploaded_file.getvalue()
+    blend_bytes = source_blend_file.getvalue() if source_blend_file is not None else b""
+    palette_bytes = source_palette_file.getvalue() if source_palette_file is not None else b""
 
     try:
         with st.spinner("הסטודיו מעבד את התמונה..."):
             original = CONTAINER.image_service.prepare(Image.open(uploaded_file))
+            blend_image = prepare_optional_image(source_blend_file)
+            palette_image = prepare_optional_image(source_palette_file)
             request = PipelineRequest(
-                steps=tuple(editor.steps),
+                steps=materialize_steps(tuple(editor.steps), blend_image, palette_image),
                 finish=editor.finish,
                 include_intermediate_steps=show_steps,
             )
@@ -603,6 +727,10 @@ def main() -> None:
             result.image,
             editor,
             uploaded_bytes,
+            blend_bytes,
+            palette_bytes,
+            blend_image,
+            palette_image,
         )
 
 
