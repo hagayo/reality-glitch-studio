@@ -136,3 +136,27 @@ def enhance_result( image: Image.Image, contrast: float = 1.0, color: float = 1.
     result = ImageEnhance.Contrast(image).enhance(contrast) 
     result = ImageEnhance.Color(result).enhance(color) 
     return result
+
+
+# FUTURE EFFECTS:
+# Pixel Sort
+# Kaleidoscope
+# Mosaic
+# Scan Lines
+# Color Inversion
+# Circular Ripple
+# Broken Television
+# Melting Image
+# Repeated Strips
+# Brightness-Based Shift
+
+# effects pipeline:
+# result = first_effect(image) result = second_effect(result) result = third_effect(result)
+
+# add to .github/workflows/ci.yml:
+# uv sync
+# uv run pytest
+# uv run ruff check .
+# uv run ruff format --check .
+
+# Add MIT License
