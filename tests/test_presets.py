@@ -11,7 +11,7 @@ def test_repository_returns_known_presets() -> None:
     repository = InMemoryPresetRepository()
 
     assert repository.get("Cyber Pulse").name == "Cyber Pulse"
-    assert len(repository.list_all()) >= 12
+    assert len(repository.list_all()) >= 26
 
 
 def test_repository_reports_unknown_preset() -> None:
@@ -59,9 +59,23 @@ def test_preset_settings_are_not_shared_between_steps() -> None:
         "Neon Fracture",
         "Electric Wave",
         "Infinite Reflection",
+        "Sorted Spectrum",
+        "Crystal Bloom",
+        "Ripple Dream",
+        "Prism Storm",
+        "Aurora Bloom",
+        "Melted Skyline",
+        "Noir Spiral",
+        "Glass Echo",
+        "Static Tide",
+        "Mosaic Pop",
+        "Twisted Center",
+        "Retro Broadcast",
+        "Retro Mosaic",
+        "Vortex Bloom",
     ],
 )
-def test_new_style_presets_exist(preset_name: str) -> None:
+def test_style_presets_exist(preset_name: str) -> None:
     repository = InMemoryPresetRepository()
 
     assert repository.get(preset_name).name == preset_name

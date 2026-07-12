@@ -168,4 +168,167 @@ class InMemoryPresetRepository:
                 ),
                 finish=FinishSettings(contrast=1.2, color=1.3),
             ),
+            Preset(
+                name="Sorted Spectrum",
+                steps=(
+                    EffectStep(
+                        EffectId.PIXEL_SORT,
+                        {"orientation": "horizontal", "threshold": 96, "reverse": False, "min_segment_length": 10},
+                    ),
+                    EffectStep(EffectId.RGB_SPLIT, {"distance": 14}),
+                ),
+                finish=FinishSettings(contrast=1.15, color=1.55),
+            ),
+            Preset(
+                name="Crystal Bloom",
+                steps=(
+                    EffectStep(
+                        EffectId.KALEIDOSCOPE,
+                        {"segments": 8, "rotation_degrees": 18.0, "zoom": 1.0},
+                    ),
+                    EffectStep(EffectId.RGB_SPLIT, {"distance": 10}),
+                ),
+                finish=FinishSettings(contrast=1.18, color=1.35),
+            ),
+            Preset(
+                name="Ripple Dream",
+                steps=(
+                    EffectStep(
+                        EffectId.CIRCULAR_RIPPLE,
+                        {"amplitude": 18, "wavelength": 34, "phase_degrees": 0.0},
+                    ),
+                    EffectStep(
+                        EffectId.WAVE,
+                        {"amplitude": 10, "frequency": 2.0, "vertical": False},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.05, color=1.25),
+            ),
+            Preset(
+                name="Prism Storm",
+                steps=(
+                    EffectStep(
+                        EffectId.CIRCULAR_RIPPLE,
+                        {"amplitude": 14, "wavelength": 28, "phase_degrees": 45.0},
+                    ),
+                    EffectStep(
+                        EffectId.KALEIDOSCOPE,
+                        {"segments": 6, "rotation_degrees": 12.0, "zoom": 0.95},
+                    ),
+                    EffectStep(
+                        EffectId.PIXEL_SORT,
+                        {"orientation": "vertical", "threshold": 120, "reverse": True, "min_segment_length": 12},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.22, color=1.6),
+            ),
+            Preset(
+                name="Aurora Bloom",
+                steps=(
+                    EffectStep(
+                        EffectId.KALEIDOSCOPE,
+                        {"segments": 10, "rotation_degrees": 24.0, "zoom": 1.08},
+                    ),
+                    EffectStep(
+                        EffectId.CIRCULAR_RIPPLE,
+                        {"amplitude": 10, "wavelength": 42, "phase_degrees": 10.0},
+                    ),
+                    EffectStep(EffectId.RGB_SPLIT, {"distance": 8}),
+                ),
+                finish=FinishSettings(contrast=1.12, color=1.55),
+            ),
+            Preset(
+                name="Melted Skyline",
+                steps=(
+                    EffectStep(
+                        EffectId.PIXEL_SORT,
+                        {"orientation": "vertical", "threshold": 88, "reverse": False, "min_segment_length": 9},
+                    ),
+                    EffectStep(
+                        EffectId.WAVE,
+                        {"amplitude": 16, "frequency": 2.5, "vertical": True},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.18, color=1.35),
+            ),
+            Preset(
+                name="Noir Spiral",
+                steps=(
+                    EffectStep(EffectId.GRAYSCALE, {}),
+                    EffectStep(
+                        EffectId.KALEIDOSCOPE,
+                        {"segments": 7, "rotation_degrees": 14.0, "zoom": 1.0},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.7, color=1.0),
+            ),
+            Preset(
+                name="Glass Echo",
+                steps=(
+                    EffectStep(EffectId.MIRROR, {"mode": MirrorMode.TOP.value}),
+                    EffectStep(
+                        EffectId.KALEIDOSCOPE,
+                        {"segments": 6, "rotation_degrees": 8.0, "zoom": 0.9},
+                    ),
+                    EffectStep(
+                        EffectId.PORTAL,
+                        {"repetitions": 4, "scale": 0.76, "rotation": 0},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.28, color=1.3),
+            ),
+            Preset(
+                name="Static Tide",
+                steps=(
+                    EffectStep(
+                        EffectId.CIRCULAR_RIPPLE,
+                        {"amplitude": 12, "wavelength": 24, "phase_degrees": 0.0},
+                    ),
+                    EffectStep(
+                        EffectId.GLITCH,
+                        {"intensity": 34, "block_count": 14, "seed": 5151},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.14, color=1.4),
+            ),
+            Preset(
+                name="Mosaic Pop",
+                steps=(
+                    EffectStep(EffectId.MOSAIC, {"block_size": 14}),
+                    EffectStep(EffectId.RGB_SPLIT, {"distance": 9}),
+                ),
+                finish=FinishSettings(contrast=1.1, color=1.35),
+            ),
+            Preset(
+                name="Twisted Center",
+                steps=(
+                    EffectStep(EffectId.SWIRL, {"strength": 4.8, "radius": 210.0}),
+                    EffectStep(EffectId.CIRCULAR_RIPPLE, {"amplitude": 10, "wavelength": 36, "phase_degrees": 0.0}),
+                ),
+                finish=FinishSettings(contrast=1.12, color=1.25),
+            ),
+            Preset(
+                name="Retro Broadcast",
+                steps=(
+                    EffectStep(EffectId.RETRO_CRT, {"scanline_strength": 0.28, "line_spacing": 3, "channel_shift": 2, "noise_strength": 0.03, "seed": 1984}),
+                    EffectStep(EffectId.GLITCH, {"intensity": 18, "block_count": 8, "seed": 202}),
+                ),
+                finish=FinishSettings(contrast=1.05, color=1.1),
+            ),
+            Preset(
+                name="Retro Mosaic",
+                steps=(
+                    EffectStep(EffectId.MOSAIC, {"block_size": 18}),
+                    EffectStep(EffectId.RETRO_CRT, {"scanline_strength": 0.18, "line_spacing": 4, "channel_shift": 1, "noise_strength": 0.015, "seed": 77}),
+                ),
+                finish=FinishSettings(contrast=1.08, color=1.2),
+            ),
+            Preset(
+                name="Vortex Bloom",
+                steps=(
+                    EffectStep(EffectId.SWIRL, {"strength": 6.0, "radius": 240.0}),
+                    EffectStep(EffectId.KALEIDOSCOPE, {"segments": 8, "rotation_degrees": 14.0, "zoom": 1.05}),
+                ),
+                finish=FinishSettings(contrast=1.18, color=1.5),
+            ),
         )

@@ -92,10 +92,6 @@ http://localhost:8501
 
 התמונה מוגבלת לגודל מרבי כדי לשמור על זמן עיבוד וצריכת זיכרון סבירים.
 
-## Live Demo
-
-[Open Reality Glitch Studio](https://reality-glitch.streamlit.app)
-
 ## ארכיטקטורה
 
 ```text
@@ -302,3 +298,70 @@ uv run streamlit run app.py
 הפרויקט מופץ תחת רישיון MIT. ראו את הקובץ [LICENSE](LICENSE).
 
 Copyright © 2026 Hagay Onn.
+
+
+## Streamlit Cloud import error
+
+If deployment reports `ModuleNotFoundError: No module named reality_glitch`,
+make sure the repository contains the `[build-system]` and
+`[tool.hatch.build.targets.wheel]` sections in `pyproject.toml`, then regenerate
+and commit `uv.lock`:
+
+```bash
+uv lock
+uv sync --locked
+git add pyproject.toml uv.lock .github/workflows/ci.yml
+git commit -m "Fix src package installation"
+git push
+```
+
+
+## New effects in this version
+
+- Pixel Sort
+- Kaleidoscope
+- Circular Ripple
+
+## Extra presets in this version
+
+- Sorted Spectrum
+- Crystal Bloom
+- Ripple Dream
+- Prism Storm
+
+
+## Visual polish in this version
+
+- Smoother Kaleidoscope rendering with bilinear sampling
+- Smoother Circular Ripple rendering with bilinear sampling
+- Pixel Sort now supports minimum segment length for cleaner compositions
+- More tuned presets for stronger results
+
+
+## Additional strong effects in this version
+
+- Mosaic
+- Swirl
+- Retro CRT
+
+## Additional presets in this version
+
+- Mosaic Pop
+- Twisted Center
+- Retro Broadcast
+- Retro Mosaic
+- Vortex Bloom
+
+## UX and UI improvements
+
+- Responsive studio-style layout
+- Clear onboarding screen before image upload
+- Quick random-preset and reset actions
+- Live pipeline summary
+- Optional intermediate-step rendering
+- Dedicated Studio, Pipeline and Export tabs
+- Image metadata cards
+- GIF generation only on demand
+- Automatic stale-GIF detection after settings change
+- Improved light and dark mode styling
+- Mobile-friendly layout

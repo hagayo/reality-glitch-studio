@@ -12,6 +12,12 @@ class EffectId(StrEnum):
     MIRROR = "mirror"
     PORTAL = "portal"
     GRAYSCALE = "grayscale"
+    PIXEL_SORT = "pixel_sort"
+    KALEIDOSCOPE = "kaleidoscope"
+    CIRCULAR_RIPPLE = "circular_ripple"
+    MOSAIC = "mosaic"
+    SWIRL = "swirl"
+    RETRO_CRT = "retro_crt"
 
 
 class MirrorMode(StrEnum):
