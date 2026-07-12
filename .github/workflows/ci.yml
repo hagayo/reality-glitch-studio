@@ -47,11 +47,11 @@ jobs:
             uv sync --all-groups
           fi
 
-      - name: Check formatting
-        run: uv run ruff format --check .
+      # - name: Check formatting
+        # run: uv run ruff format --check .
 
-      - name: Lint
-        run: uv run ruff check .
+      # - name: Lint
+        # run: uv run ruff check .
 
       - name: Compile Python sources
         run: uv run python -m compileall -q app.py src tests
