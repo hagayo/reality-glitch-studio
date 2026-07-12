@@ -46,3 +46,8 @@ def test_animation_options_accept_boundary_values() -> None:
 
     assert options.frame_count == 2
     assert options.frame_duration_ms == 20
+
+
+def test_animation_options_reject_unknown_mode() -> None:
+    with pytest.raises(ValueError, match="mode"):
+        AnimationOptions(mode="weird")

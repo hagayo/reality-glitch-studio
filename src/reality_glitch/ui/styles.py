@@ -817,6 +817,29 @@ def apply_styles() -> None:
                 box-shadow: 0 12px 28px rgba(79,124,255,.24);
             }
 
+
+            .mask-preview-heading {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                margin: 1.35rem 0 .75rem;
+                padding: .85rem 1rem;
+                border-radius: 16px;
+                background: linear-gradient(135deg, rgba(0,215,255,.14), rgba(255,213,79,.14));
+                border: 1px solid rgba(0,170,210,.20);
+            }
+            .mask-preview-heading span {
+                font-size: .72rem;
+                font-weight: 950;
+                letter-spacing: .11em;
+                color: #007f9b;
+            }
+            .mask-preview-heading strong {
+                color: #0b3140;
+                font-size: 1rem;
+            }
+
             @media (max-width: 1050px) {
                 [data-testid="stSidebar"] { width: 22rem !important; }
                 .energy-hero { min-height: 230px; padding: 1.7rem; }

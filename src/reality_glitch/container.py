@@ -29,6 +29,7 @@ from reality_glitch.services import (
     PillowImageExporter,
     PillowImageService,
 )
+from reality_glitch.services.preset_blend_service import PresetBlendService
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,6 +40,7 @@ class ApplicationContainer:
     pipeline: ImagePipelineService
     animation: GifAnimationService
     exporter: PillowImageExporter
+    preset_blender: PresetBlendService
 
 
 def build_container() -> ApplicationContainer:
@@ -72,4 +74,5 @@ def build_container() -> ApplicationContainer:
         pipeline=pipeline,
         animation=GifAnimationService(registry, pipeline),
         exporter=PillowImageExporter(),
+        preset_blender=PresetBlendService(),
     )

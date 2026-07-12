@@ -158,3 +158,34 @@ def test_pipeline_rejects_invalid_effect_output() -> None:
             Image.new("RGB", (1, 1)),
             PipelineRequest(steps=(EffectStep(EffectId.WAVE),)),
         )
+
+
+
+def test_pipeline_applies_mask_only_to_selected_region() -> None:
+    from PIL import Image
+    from reality_glitch.domain.models import EffectId, EffectStep, PipelineRequest
+    from reality_glitch.services.image_service import PillowImageService
+    from reality_glitch.infrastructure.registry import InMemoryEffectRegistry
+    from reality_glitch.effects.mirror import MirrorEffect
+    from reality_glitch.services.pipeline_service import ImagePipelineService
+
+    image = Image.new("RGB", (90, 90), "black")
+    for x in range(45):
+        for y in range(90):
+            image.putpixel((x, y), (255, 0, 0))
+
+    service = ImagePipelineService(InMemoryEffectRegistry([MirrorEffect()]), PillowImageService())
+    result = service.execute(
+        image,
+        PipelineRequest(
+            steps=(
+                EffectStep(
+                    EffectId.MIRROR,
+                    {"mode": "left"},
+                    {"preset": "center", "selected_cells": ["1-1"], "feather": 0},
+                ),
+            ),
+        ),
+    ).image
+
+    assert result.getpixel((10, 10)) == (255, 0, 0)

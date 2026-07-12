@@ -10,6 +10,7 @@ from reality_glitch.domain.models import (
 )
 from reality_glitch.domain.ports import EffectRegistry
 from reality_glitch.services.image_service import PillowImageService
+from reality_glitch.services.mask_service import build_mask_image
 
 
 class ImagePipelineService:
@@ -42,6 +43,11 @@ class ImagePipelineService:
                 raise InvalidEffectOutputError(
                     f"Effect {step.effect_id} did not return a Pillow image"
                 )
+
+            if step.mask:
+                mask_image = build_mask_image(result.size, step.mask)
+                if mask_image is not None:
+                    next_result = Image.composite(next_result, result, mask_image)
 
             result = next_result
             if request.include_intermediate_steps:

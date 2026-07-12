@@ -24,6 +24,7 @@ from reality_glitch.ui.controls import (
 )
 from reality_glitch.ui.state import EditorState
 from reality_glitch.ui.styles import apply_styles
+from reality_glitch.services.mask_service import build_mask_overlay
 
 
 logging.basicConfig(level=logging.INFO)
@@ -94,6 +95,82 @@ def reset_editor() -> None:
     queue_preset("מותאם אישית")
 
 
+def apply_blended_preset(name_a: str, name_b: str, ratio_percent: int) -> None:
+    preset_a = CONTAINER.presets.get(name_a)
+    preset_b = CONTAINER.presets.get(name_b)
+    blended = CONTAINER.preset_blender.blend(preset_a, preset_b, ratio_percent / 100.0)
+    st.session_state.editor = EditorState.from_preset(blended)
+    clear_generated_gif()
+
+
+def default_mask() -> dict[str, Any]:
+    return {"preset": "center", "selected_cells": ["1-1"], "feather": 6}
+
+
+def render_mask_controls(step: EffectStep, index: int) -> dict[str, Any] | None:
+    prefix = f"mask_{index}_{step.effect_id.value}"
+    current_mask = dict(step.mask) if step.mask else default_mask()
+    enabled = st.toggle(
+        "להחיל אפקט רק על אזור מסוים",
+        value=step.mask is not None,
+        key=f"{prefix}_enabled",
+    )
+    if not enabled:
+        return None
+
+    preset_options = ["center", "background", "top", "bottom", "left", "right", "custom"]
+    labels = {
+        "center": "מרכז",
+        "background": "רקע / מסביב למרכז",
+        "top": "שליש עליון",
+        "bottom": "שליש תחתון",
+        "left": "שליש שמאלי",
+        "right": "שליש ימני",
+        "custom": "בחירה ידנית בגריד",
+    }
+    preset = st.selectbox(
+        "אזור מסכה",
+        preset_options,
+        index=preset_options.index(str(current_mask.get("preset", "center"))),
+        key=f"{prefix}_preset",
+        format_func=labels.get,
+    )
+    mask = dict(current_mask)
+    mask["preset"] = preset
+
+    if preset == "custom":
+        cell_labels = {
+            "0-0": "↖ שמאל עליון",
+            "0-1": "↑ עליון מרכז",
+            "0-2": "↗ ימין עליון",
+            "1-0": "← מרכז שמאל",
+            "1-1": "• מרכז",
+            "1-2": "→ מרכז ימין",
+            "2-0": "↙ שמאל תחתון",
+            "2-1": "↓ תחתון מרכז",
+            "2-2": "↘ ימין תחתון",
+        }
+        selected_cells = st.multiselect(
+            "תאי גריד פעילים",
+            list(cell_labels),
+            default=list(mask.get("selected_cells", ["1-1"])),
+            key=f"{prefix}_cells",
+            format_func=cell_labels.get,
+        )
+        mask["selected_cells"] = selected_cells
+    else:
+        mask.setdefault("selected_cells", ["1-1"])
+
+    mask["feather"] = st.slider(
+        "ריכוך גבולות",
+        0,
+        40,
+        int(mask.get("feather", 6)),
+        key=f"{prefix}_feather",
+    )
+    return mask
+
+
 def build_effect_options() -> list[EffectId]:
     return list(EffectId)
 
@@ -135,11 +212,12 @@ def clear_pipeline() -> None:
 
 
 def render_pipeline_card(step: EffectStep, index: int, total: int) -> None:
+    mask_badge = ' <span class="mask-badge">MASK</span>' if step.mask else ""
     st.markdown(
         f"""
         <div class="effect-card-title">
             <div class="effect-card-index">{index + 1}</div>
-            <div class="effect-card-name">{DISPLAY_NAMES[step.effect_id]}</div>
+            <div class="effect-card-name">{DISPLAY_NAMES[step.effect_id]}{mask_badge}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -213,7 +291,7 @@ def materialize_steps(
                 palette_image,
             )
             settings["palette_image"] = palette_source
-        materialized.append(EffectStep(step.effect_id, settings))
+        materialized.append(EffectStep(step.effect_id, settings, step.mask))
     return tuple(materialized)
 
 
@@ -388,7 +466,9 @@ def render_sidebar() -> tuple[Any, Any, Any, EditorState, bool]:
         for index, step in enumerate(editor.steps):
             st.markdown('<div class="effect-card">', unsafe_allow_html=True)
             render_pipeline_card(step, index, total_steps)
-            edited_steps.append(render_effect_settings(step, index))
+            updated_step = render_effect_settings(step, index)
+            mask_settings = render_mask_controls(updated_step, index)
+            edited_steps.append(EffectStep(updated_step.effect_id, updated_step.settings, mask_settings))
             st.markdown('</div>', unsafe_allow_html=True)
 
         render_section_heading(3, "גימור", "הטאץ׳ האחרון")
@@ -439,6 +519,35 @@ def render_sidebar() -> tuple[Any, Any, Any, EditorState, bool]:
             load_preset(st.session_state.preset_selector)
             st.rerun()
 
+        with st.expander("בלנד בין שני Presets", expanded=False):
+            blend_names = [preset.name for preset in CONTAINER.presets.list_all()]
+            blend_a = st.selectbox(
+                "Preset ראשון",
+                blend_names,
+                index=blend_names.index(st.session_state.preset_selector) if st.session_state.preset_selector in blend_names else 0,
+                key="blend_preset_a",
+            )
+            blend_b = st.selectbox(
+                "Preset שני",
+                blend_names,
+                index=min(1, len(blend_names) - 1),
+                key="blend_preset_b",
+            )
+            blend_ratio = st.slider(
+                "אחוז לכיוון ה-Preset השני",
+                0,
+                100,
+                50,
+                key="blend_ratio_slider",
+            )
+            if st.button(
+                "החלת Blend",
+                use_container_width=True,
+                key="apply_preset_blend",
+            ):
+                apply_blended_preset(blend_a, blend_b, blend_ratio)
+                st.rerun()
+
         editor.steps = edited_steps
         if editor.active_preset != "מותאם אישית":
             editor.active_preset = "מותאם אישית" if edited_steps != list(CONTAINER.presets.get(editor.active_preset).steps) else editor.active_preset
@@ -465,7 +574,61 @@ def render_image_metadata(original: Image.Image, step_count: int) -> None:
             )
 
 
-def render_studio(original: Image.Image, result_image: Image.Image) -> None:
+def render_mask_overlay_preview(original: Image.Image, steps: list[EffectStep]) -> None:
+    masked_steps = [(index, step) for index, step in enumerate(steps) if step.mask]
+    if not masked_steps:
+        return
+
+    st.markdown(
+        '<div class="mask-preview-heading"><span>MASK PREVIEW</span><strong>אזורי ההשפעה על התמונה</strong></div>',
+        unsafe_allow_html=True,
+    )
+
+    selector_options = ["all"] + [str(index) for index, _ in masked_steps]
+    labels = {"all": "כל המסכות יחד"}
+    for index, step in masked_steps:
+        labels[str(index)] = f"{index + 1}. {DISPLAY_NAMES[step.effect_id]}"
+
+    controls_left, controls_middle, controls_right = st.columns([1.35, 1.0, 0.8])
+    with controls_left:
+        selected = st.selectbox(
+            "איזו מסכה להציג",
+            selector_options,
+            format_func=labels.get,
+            key="mask_overlay_selector",
+        )
+    with controls_middle:
+        opacity_percent = st.slider(
+            "שקיפות שכבה",
+            10,
+            90,
+            45,
+            5,
+            key="mask_overlay_opacity",
+        )
+    with controls_right:
+        show_grid = st.toggle(
+            "הצגת גריד",
+            value=True,
+            key="mask_overlay_grid",
+        )
+
+    if selected == "all":
+        masks = [dict(step.mask) for _, step in masked_steps if step.mask]
+    else:
+        selected_index = int(selected)
+        masks = [dict(step.mask) for index, step in masked_steps if index == selected_index and step.mask]
+
+    overlay = build_mask_overlay(
+        original,
+        masks,
+        opacity=round((opacity_percent / 100.0) * 255),
+        show_grid=show_grid,
+    )
+    st.image(overlay, caption="האזורים בציאן הם האזורים שבהם האפקט יפעל", use_container_width=True)
+
+
+def render_studio(original: Image.Image, result_image: Image.Image, steps: list[EffectStep]) -> None:
     st.markdown(
         '<div class="section-banner"><span>LIVE PREVIEW</span><h2>לפני ואחרי</h2></div>',
         unsafe_allow_html=True,
@@ -477,6 +640,8 @@ def render_studio(original: Image.Image, result_image: Image.Image) -> None:
     with result_column:
         st.markdown('<div class="image-label result">תוצאה</div>', unsafe_allow_html=True)
         st.image(result_image, use_container_width=True)
+
+    render_mask_overlay_preview(original, steps)
 
 
 def render_steps(result_steps: tuple[Any, ...]) -> None:
@@ -715,7 +880,7 @@ def main() -> None:
     )
 
     with studio_tab:
-        render_studio(original, result.image)
+        render_studio(original, result.image, editor.steps)
         st.markdown('<div class="quick-export-line">התוצאה מוכנה - עברו לטאב יצוא ו-GIF כדי להוריד או להנפיש.</div>', unsafe_allow_html=True)
 
     with steps_tab:

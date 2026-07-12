@@ -42,6 +42,7 @@ class EffectDefinition:
 class EffectStep:
     effect_id: EffectId
     settings: dict[str, Any] = field(default_factory=dict)
+    mask: dict[str, Any] | None = None
 
     def with_settings(self, **changes: Any) -> EffectStep:
         return replace(self, settings={**self.settings, **changes})
