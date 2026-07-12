@@ -144,10 +144,15 @@ def apply_styles() -> None:
                 border: 1px solid rgba(255,255,255,.20);
                 background: rgba(255,255,255,.08);
                 color: #fff !important;
+                font-weight: 900 !important;
+                letter-spacing: .01em;
+                transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
             }
             [data-testid="stSidebar"] .stButton > button:hover {
                 border-color: var(--cyan);
-                background: rgba(0,200,232,.16);
+                background: linear-gradient(135deg, rgba(0,200,232,.24), rgba(15,162,201,.18));
+                box-shadow: 0 10px 24px rgba(0,200,232,.18);
+                transform: translateY(-1px);
             }
             [data-testid="stSidebar"] .stButton > button[kind="primary"] {
                 color: #062f39 !important;
@@ -178,6 +183,36 @@ def apply_styles() -> None:
                 background: rgba(0,200,232,.07);
             }
 
+
+            .effect-card {
+                margin: .85rem 0;
+                padding: .82rem;
+                border-radius: 16px;
+                border: 1px solid rgba(255,255,255,.15);
+                background: rgba(255,255,255,.06);
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+            }
+            .effect-card-title {
+                display: flex;
+                align-items: center;
+                gap: .6rem;
+                margin-bottom: .65rem;
+            }
+            .effect-card-index {
+                width: 28px;
+                height: 28px;
+                display: grid;
+                place-items: center;
+                border-radius: 10px;
+                font-weight: 950;
+                color: #052c37 !important;
+                background: linear-gradient(135deg, var(--yellow), #fff1a4);
+            }
+            .effect-card-name {
+                font-weight: 900;
+                color: #ffffff !important;
+                font-size: .95rem;
+            }
             .sidebar-tip {
                 margin-top: 1.15rem;
                 padding: .85rem .9rem;
@@ -195,8 +230,8 @@ def apply_styles() -> None:
             [data-testid="stSidebar"] [data-baseweb="input"] > div,
             [data-testid="stSidebar"] [data-baseweb="textarea"] > div,
             [data-testid="stSidebar"] [data-baseweb="base-input"] {
-                color: #f7fffd !important;
-                background: #0b4a56 !important;
+                color: #082f49 !important;
+                background: #ffffff !important;
                 border-color: rgba(255,255,255,.28) !important;
             }
             /* Form fields use light backgrounds, so their entered/selected text is navy. */
@@ -220,8 +255,8 @@ def apply_styles() -> None:
             }
             [data-testid="stSidebar"] input::placeholder,
             [data-testid="stSidebar"] textarea::placeholder {
-                color: rgba(247,255,253,.58) !important;
-                -webkit-text-fill-color: rgba(247,255,253,.58) !important;
+                color: rgba(8,47,73,.48) !important;
+                -webkit-text-fill-color: rgba(8,47,73,.48) !important;
             }
             [data-testid="stSidebar"] details,
             [data-testid="stSidebar"] details > summary {
@@ -552,15 +587,24 @@ def apply_styles() -> None:
                 background: rgba(255,255,255,.76);
             }
             .stTabs [data-baseweb="tab"] {
-                min-height: 45px;
-                padding: .55rem 1rem;
+                min-height: 50px;
+                padding: .7rem 1.1rem;
                 border-radius: 12px;
-                color: var(--muted);
-                font-weight: 800;
+                color: #11414b;
+                font-weight: 950;
+                background: transparent;
+                transition: transform .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
+            }
+            .stTabs [data-baseweb="tab"]:hover {
+                color: #073a44 !important;
+                background: linear-gradient(135deg, rgba(0,200,232,.16), rgba(255,210,63,.18));
+                box-shadow: 0 8px 20px rgba(0, 125, 145, .10);
+                transform: translateY(-1px);
             }
             .stTabs [aria-selected="true"] {
                 color: #fff !important;
                 background: linear-gradient(135deg, var(--teal), #00897d);
+                box-shadow: 0 10px 24px rgba(0,137,125,.22);
             }
 
             .stButton > button,
