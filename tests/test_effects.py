@@ -5,10 +5,13 @@ import pytest
 from PIL import Image, ImageChops
 
 from reality_glitch.effects import (
+    CenterBulgeEffect,
+    CenterPinchEffect,
     CircularRippleEffect,
     GlitchEffect,
     GrayscaleEffect,
     KaleidoscopeEffect,
+    LocalTwirlEffect,
     MirrorEffect,
     MosaicEffect,
     PixelSortEffect,
@@ -33,6 +36,9 @@ EFFECT_CASES = [
     (MosaicEffect(), {"block_size": 6}),
     (SwirlEffect(), {"strength": 2.0, "radius": 40.0}),
     (RetroCrtEffect(), {"scanline_strength": 0.2, "line_spacing": 3, "channel_shift": 1, "noise_strength": 0.01, "seed": 3}),
+    (CenterBulgeEffect(), {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 0.8, "falloff": 1.8}),
+    (CenterPinchEffect(), {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 0.8, "falloff": 1.8}),
+    (LocalTwirlEffect(), {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 2.5, "falloff": 1.6}),
 ]
 
 
@@ -249,3 +255,36 @@ def test_swirl_rejects_invalid_radius(radius: float, rgb_image: Image.Image) -> 
 def test_retro_crt_rejects_invalid_line_spacing(line_spacing: int, rgb_image: Image.Image) -> None:
     with pytest.raises(ValueError, match="line_spacing"):
         RetroCrtEffect().apply(rgb_image, {"line_spacing": line_spacing})
+
+
+def test_center_bulge_zero_strength_is_identity(rgb_image: Image.Image) -> None:
+    result = CenterBulgeEffect().apply(rgb_image, {"strength": 0.0, "radius": 20.0})
+    assert ImageChops.difference(result, rgb_image).getbbox() is None
+
+
+@pytest.mark.parametrize("radius", [0, -5])
+def test_center_bulge_rejects_invalid_radius(radius: float, rgb_image: Image.Image) -> None:
+    with pytest.raises(ValueError, match="radius"):
+        CenterBulgeEffect().apply(rgb_image, {"radius": radius})
+
+
+def test_center_pinch_zero_strength_is_identity(rgb_image: Image.Image) -> None:
+    result = CenterPinchEffect().apply(rgb_image, {"strength": 0.0, "radius": 20.0})
+    assert ImageChops.difference(result, rgb_image).getbbox() is None
+
+
+@pytest.mark.parametrize("radius", [0, -5])
+def test_center_pinch_rejects_invalid_radius(radius: float, rgb_image: Image.Image) -> None:
+    with pytest.raises(ValueError, match="radius"):
+        CenterPinchEffect().apply(rgb_image, {"radius": radius})
+
+
+def test_local_twirl_zero_strength_is_identity(rgb_image: Image.Image) -> None:
+    result = LocalTwirlEffect().apply(rgb_image, {"strength": 0.0, "radius": 20.0})
+    assert ImageChops.difference(result, rgb_image).getbbox() is None
+
+
+@pytest.mark.parametrize("radius", [0, -5])
+def test_local_twirl_rejects_invalid_radius(radius: float, rgb_image: Image.Image) -> None:
+    with pytest.raises(ValueError, match="radius"):
+        LocalTwirlEffect().apply(rgb_image, {"radius": radius})

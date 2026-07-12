@@ -11,7 +11,7 @@ def test_repository_returns_known_presets() -> None:
     repository = InMemoryPresetRepository()
 
     assert repository.get("Cyber Pulse").name == "Cyber Pulse"
-    assert len(repository.list_all()) >= 26
+    assert len(repository.list_all()) >= 30
 
 
 def test_repository_reports_unknown_preset() -> None:
@@ -73,6 +73,10 @@ def test_preset_settings_are_not_shared_between_steps() -> None:
         "Retro Broadcast",
         "Retro Mosaic",
         "Vortex Bloom",
+        "Focus Pop",
+        "Bubble Portrait",
+        "Implosion",
+        "Twirl Focus",
     ],
 )
 def test_style_presets_exist(preset_name: str) -> None:

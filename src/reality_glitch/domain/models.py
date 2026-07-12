@@ -18,6 +18,9 @@ class EffectId(StrEnum):
     MOSAIC = "mosaic"
     SWIRL = "swirl"
     RETRO_CRT = "retro_crt"
+    CENTER_BULGE = "center_bulge"
+    CENTER_PINCH = "center_pinch"
+    LOCAL_TWIRL = "local_twirl"
 
 
 class MirrorMode(StrEnum):

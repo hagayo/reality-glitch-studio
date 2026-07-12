@@ -189,9 +189,9 @@ def render_header() -> None:
             <div class="hero-orb orb-one"></div>
             <div class="hero-orb orb-two"></div>
             <div class="energy-copy">
-                <span class="energy-kicker">PYTHON CREATIVE PLAYGROUND</span>
+                <span class="energy-kicker">CREATIVE IMAGE LAB</span>
                 <h1>Reality Glitch <em>Studio</em></h1>
-                <p>הופכים תמונה רגילה ליצירה חיה, מפתיעה ומונפשת.</p>
+                <p>מעלים תמונה, משחקים עם המציאות ויוצרים משהו שאף אחד אחר לא יקבל.</p>
                 <div class="hero-pills">
                     <span>{effect_count} אפקטים</span>
                     <span>{preset_count} סגנונות</span>
@@ -199,7 +199,7 @@ def render_header() -> None:
                     <span>GIF</span>
                 </div>
             </div>
-            <div class="hero-spark">⚡</div>
+            <div class="hero-spark">✦</div>
         </section>
         """,
         unsafe_allow_html=True,
@@ -213,12 +213,12 @@ def render_sidebar_header() -> None:
             <div class="brand-mark">R</div>
             <div>
                 <strong>Reality Glitch</strong>
-                <span>יוצרים בארבעה צעדים</span>
+                <span>סטודיו יצירתי בפייתון</span>
             </div>
         </div>
         <div class="start-here">
             <span class="start-dot"></span>
-            מתחילים כאן - העלו תמונה
+            מתחילים כאן - מעלים תמונה
         </div>
         """,
         unsafe_allow_html=True,
@@ -243,9 +243,9 @@ def render_empty_state() -> None:
         <section class="launch-zone">
             <div class="launch-symbol">↥</div>
             <div>
-                <span class="launch-label">הצעד הראשון</span>
-                <h2>העלו תמונה מהפאנל הצבעוני</h2>
-                <p>משם אפשר לבחור סגנון מוכן או להרכיב Pipeline אישי.</p>
+                <span class="launch-label">START HERE</span>
+                <h2>בחרו תמונה והתחילו לשנות את המציאות</h2>
+                <p>האפקטים פועלים מיד, ואפשר לבנות שילוב אישי ולהנפיש אותו.</p>
             </div>
         </section>
         """,
@@ -285,23 +285,6 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
             label_visibility="collapsed",
         )
 
-        render_section_heading(2, "סגנון", "קיצור דרך לתוצאה חזקה")
-        preset_names = [preset.name for preset in CONTAINER.presets.list_all()]
-        st.selectbox(
-            "Preset",
-            preset_names,
-            key="preset_selector",
-            label_visibility="collapsed",
-        )
-        if st.button(
-            "הפעלת הסגנון",
-            type="primary",
-            use_container_width=True,
-            key="apply_preset",
-        ):
-            load_preset(st.session_state.preset_selector)
-            st.rerun()
-
         quick_left, quick_right = st.columns(2)
         with quick_left:
             if st.button("הפתע אותי", use_container_width=True):
@@ -312,7 +295,7 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
                 reset_editor()
                 st.rerun()
 
-        render_section_heading(3, "אפקטים", "בנו רצף משלכם")
+        render_section_heading(2, "אפקטים", "בנו רצף משלכם")
         add_col, clear_col = st.columns([1.65, 0.75])
         with add_col:
             selected_to_add = st.selectbox(
@@ -346,7 +329,7 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
             edited_steps.append(render_effect_settings(step, index))
             st.markdown('</div>', unsafe_allow_html=True)
 
-        render_section_heading(4, "גימור", "הטאץ׳ האחרון")
+        render_section_heading(3, "גימור", "הטאץ׳ האחרון")
         contrast = st.slider(
             "ניגודיות",
             0.5,
@@ -371,11 +354,28 @@ def render_sidebar() -> tuple[Any, EditorState, bool]:
             """
             <div class="sidebar-tip">
                 <b>טיפ</b>
-                התחילו מ-Preset, ואז שנו רק אפקט אחד בכל פעם.
+                האפקטים החדשים המקומיים עובדים הכי טוב כשהאובייקט הראשי קרוב למרכז.
             </div>
             """,
             unsafe_allow_html=True,
         )
+
+        render_section_heading(4, "פריסטים", "קיצור דרך לתוצאה מוכנה")
+        preset_names = [preset.name for preset in CONTAINER.presets.list_all()]
+        st.selectbox(
+            "Preset",
+            preset_names,
+            key="preset_selector",
+            label_visibility="collapsed",
+        )
+        if st.button(
+            "הפעלת הסגנון",
+            type="primary",
+            use_container_width=True,
+            key="apply_preset",
+        ):
+            load_preset(st.session_state.preset_selector)
+            st.rerun()
 
         editor.steps = edited_steps
         if editor.active_preset != "מותאם אישית":

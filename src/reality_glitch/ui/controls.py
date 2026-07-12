@@ -21,6 +21,9 @@ DISPLAY_NAMES = {
     EffectId.MOSAIC: "פסיפס",
     EffectId.SWIRL: "סחרור",
     EffectId.RETRO_CRT: "מסך CRT",
+    EffectId.CENTER_BULGE: "ניפוח מרכזי",
+    EffectId.CENTER_PINCH: "כיווץ מרכזי",
+    EffectId.LOCAL_TWIRL: "סחרור מקומי",
 }
 
 DEFAULT_SETTINGS: dict[EffectId, dict[str, Any]] = {
@@ -59,6 +62,27 @@ DEFAULT_SETTINGS: dict[EffectId, dict[str, Any]] = {
         "channel_shift": 2,
         "noise_strength": 0.02,
         "seed": 42,
+    },
+    EffectId.CENTER_BULGE: {
+        "center_x": 50.0,
+        "center_y": 45.0,
+        "radius": 32.0,
+        "strength": 0.65,
+        "falloff": 1.8,
+    },
+    EffectId.CENTER_PINCH: {
+        "center_x": 50.0,
+        "center_y": 45.0,
+        "radius": 32.0,
+        "strength": 0.70,
+        "falloff": 1.8,
+    },
+    EffectId.LOCAL_TWIRL: {
+        "center_x": 50.0,
+        "center_y": 45.0,
+        "radius": 30.0,
+        "strength": 3.0,
+        "falloff": 1.6,
     },
 }
 
@@ -317,6 +341,58 @@ def render_effect_settings(step: EffectStep, index: int) -> EffectStep:
                     int(settings.get("seed", 42)),
                     key=f"{prefix}_crt_seed",
                 )
+            )
+
+        elif step.effect_id in {EffectId.CENTER_BULGE, EffectId.CENTER_PINCH, EffectId.LOCAL_TWIRL}:
+            settings["center_x"] = st.slider(
+                "מרכז אופקי",
+                0.0,
+                100.0,
+                float(settings.get("center_x", 50.0)),
+                1.0,
+                key=f"{prefix}_center_x",
+            )
+            settings["center_y"] = st.slider(
+                "מרכז אנכי",
+                0.0,
+                100.0,
+                float(settings.get("center_y", 45.0)),
+                1.0,
+                key=f"{prefix}_center_y",
+            )
+            settings["radius"] = st.slider(
+                "רדיוס השפעה",
+                5.0,
+                80.0,
+                float(settings.get("radius", 32.0)),
+                1.0,
+                key=f"{prefix}_local_radius",
+            )
+            if step.effect_id is EffectId.LOCAL_TWIRL:
+                settings["strength"] = st.slider(
+                    "עוצמת סחרור",
+                    -8.0,
+                    8.0,
+                    float(settings.get("strength", 3.0)),
+                    0.1,
+                    key=f"{prefix}_local_strength",
+                )
+            else:
+                settings["strength"] = st.slider(
+                    "עוצמת עיוות",
+                    0.0,
+                    2.0,
+                    float(settings.get("strength", 0.65)),
+                    0.05,
+                    key=f"{prefix}_local_strength",
+                )
+            settings["falloff"] = st.slider(
+                "רכות שוליים",
+                0.5,
+                4.0,
+                float(settings.get("falloff", 1.8)),
+                0.1,
+                key=f"{prefix}_falloff",
             )
 
     return EffectStep(step.effect_id, settings)

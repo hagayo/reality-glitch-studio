@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 
 from reality_glitch.effects import (
+    CenterBulgeEffect,
+    CenterPinchEffect,
     CircularRippleEffect,
     GlitchEffect,
     GrayscaleEffect,
     KaleidoscopeEffect,
+    LocalTwirlEffect,
     MirrorEffect,
     MosaicEffect,
     PixelSortEffect,
@@ -51,6 +54,9 @@ def build_container() -> ApplicationContainer:
             MosaicEffect(),
             SwirlEffect(),
             RetroCrtEffect(),
+            CenterBulgeEffect(),
+            CenterPinchEffect(),
+            LocalTwirlEffect(),
         )
     )
     image_service = PillowImageService(max_size=1200)

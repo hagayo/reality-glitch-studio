@@ -331,4 +331,46 @@ class InMemoryPresetRepository:
                 ),
                 finish=FinishSettings(contrast=1.18, color=1.5),
             ),
+            Preset(
+                name="Focus Pop",
+                steps=(
+                    EffectStep(
+                        EffectId.CENTER_BULGE,
+                        {"center_x": 50.0, "center_y": 42.0, "radius": 28.0, "strength": 0.9, "falloff": 1.8},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.08, color=1.12),
+            ),
+            Preset(
+                name="Bubble Portrait",
+                steps=(
+                    EffectStep(
+                        EffectId.CENTER_BULGE,
+                        {"center_x": 50.0, "center_y": 45.0, "radius": 36.0, "strength": 1.25, "falloff": 1.4},
+                    ),
+                    EffectStep(EffectId.RGB_SPLIT, {"distance": 4}),
+                ),
+                finish=FinishSettings(contrast=1.12, color=1.18),
+            ),
+            Preset(
+                name="Implosion",
+                steps=(
+                    EffectStep(
+                        EffectId.CENTER_PINCH,
+                        {"center_x": 50.0, "center_y": 45.0, "radius": 32.0, "strength": 0.95, "falloff": 1.8},
+                    ),
+                    EffectStep(EffectId.GRAYSCALE, {}),
+                ),
+                finish=FinishSettings(contrast=1.28, color=1.0),
+            ),
+            Preset(
+                name="Twirl Focus",
+                steps=(
+                    EffectStep(
+                        EffectId.LOCAL_TWIRL,
+                        {"center_x": 50.0, "center_y": 45.0, "radius": 30.0, "strength": 3.5, "falloff": 1.6},
+                    ),
+                ),
+                finish=FinishSettings(contrast=1.1, color=1.25),
+            ),
         )
