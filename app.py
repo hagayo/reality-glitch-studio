@@ -44,6 +44,13 @@ def initialize_state() -> None:
         default_preset = CONTAINER.presets.get("מותאם אישית")
         st.session_state.editor = EditorState.from_preset(default_preset)
 
+    pending_preset = st.session_state.pop("pending_preset", None)
+    if pending_preset is not None:
+        st.session_state.editor = EditorState.from_preset(
+            CONTAINER.presets.get(pending_preset)
+        )
+        st.session_state.preset_selector = pending_preset
+
     if "preset_selector" not in st.session_state:
         st.session_state.preset_selector = st.session_state.editor.active_preset
 
@@ -63,8 +70,14 @@ def clear_generated_gif() -> None:
 
 
 def load_preset(name: str) -> None:
+    """Load a preset without mutating an already-rendered widget key."""
     st.session_state.editor = EditorState.from_preset(CONTAINER.presets.get(name))
-    st.session_state.preset_selector = name
+    clear_generated_gif()
+
+
+def queue_preset(name: str) -> None:
+    """Apply a preset safely at the beginning of the next rerun."""
+    st.session_state.pending_preset = name
     clear_generated_gif()
 
 
@@ -74,11 +87,11 @@ def choose_random_preset() -> None:
         for preset in CONTAINER.presets.list_all()
         if preset.name != "מותאם אישית"
     ]
-    load_preset(random.choice(names))
+    queue_preset(random.choice(names))
 
 
 def reset_editor() -> None:
-    load_preset("מותאם אישית")
+    queue_preset("מותאם אישית")
 
 
 def build_pipeline_summary(steps: list[EffectStep]) -> str:

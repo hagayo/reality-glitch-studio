@@ -190,6 +190,98 @@ def apply_styles() -> None:
             }
             .sidebar-tip b { color: #ffb08e !important; }
 
+            /* Sidebar widget contrast: keep all controls readable on the dark panel. */
+            [data-testid="stSidebar"] [data-baseweb="select"] > div,
+            [data-testid="stSidebar"] [data-baseweb="input"] > div,
+            [data-testid="stSidebar"] [data-baseweb="textarea"] > div,
+            [data-testid="stSidebar"] [data-baseweb="base-input"] {
+                color: #f7fffd !important;
+                background: #0b4a56 !important;
+                border-color: rgba(255,255,255,.28) !important;
+            }
+            [data-testid="stSidebar"] input,
+            [data-testid="stSidebar"] textarea,
+            [data-testid="stSidebar"] [data-baseweb="select"] span,
+            [data-testid="stSidebar"] [data-baseweb="select"] div {
+                color: #f7fffd !important;
+                -webkit-text-fill-color: #f7fffd !important;
+            }
+            [data-testid="stSidebar"] input::placeholder,
+            [data-testid="stSidebar"] textarea::placeholder {
+                color: rgba(247,255,253,.58) !important;
+                -webkit-text-fill-color: rgba(247,255,253,.58) !important;
+            }
+            [data-testid="stSidebar"] details,
+            [data-testid="stSidebar"] details > summary {
+                color: #f7fffd !important;
+                background: #0a3d48 !important;
+            }
+            [data-testid="stSidebar"] details > summary:hover {
+                background: #0d4b58 !important;
+            }
+            [data-testid="stSidebar"] details p,
+            [data-testid="stSidebar"] details label,
+            [data-testid="stSidebar"] details span,
+            [data-testid="stSidebar"] details div {
+                color: #f7fffd;
+            }
+            [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+            [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
+                color: #eefefa !important;
+            }
+            [data-testid="stSidebar"] [data-baseweb="tag"] {
+                color: #06333c !important;
+                background: #ffd23f !important;
+            }
+            [data-testid="stSidebar"] [data-baseweb="tag"] * {
+                color: #06333c !important;
+                -webkit-text-fill-color: #06333c !important;
+            }
+            [data-testid="stSidebar"] [role="radiogroup"] label,
+            [data-testid="stSidebar"] [data-testid="stCheckbox"] label {
+                color: #f7fffd !important;
+            }
+            [data-testid="stSidebar"] [data-testid="stSlider"] [data-testid="stThumbValue"] {
+                color: #062f39 !important;
+                background: var(--yellow) !important;
+            }
+            /* Selectboxes use a light field, so their selected value must be dark. */
+            [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+                background: #ffffff !important;
+                border-color: rgba(8, 47, 59, .18) !important;
+                color: #082f3b !important;
+            }
+            [data-testid="stSidebar"] div[data-baseweb="select"] > div *,
+            [data-testid="stSidebar"] div[data-baseweb="select"] input {
+                color: #082f3b !important;
+                -webkit-text-fill-color: #082f3b !important;
+                opacity: 1 !important;
+            }
+            [data-testid="stSidebar"] div[data-baseweb="select"] svg {
+                fill: #082f3b !important;
+                color: #082f3b !important;
+            }
+            [data-testid="stSidebar"] div[data-baseweb="select"] input::placeholder {
+                color: #55747c !important;
+                -webkit-text-fill-color: #55747c !important;
+                opacity: 1 !important;
+            }
+
+            /* BaseWeb menus are rendered in a portal outside the sidebar. */
+            [role="listbox"],
+            [role="option"] {
+                color: #082f3b !important;
+                background: #ffffff !important;
+            }
+            [role="option"] * {
+                color: #082f3b !important;
+                -webkit-text-fill-color: #082f3b !important;
+            }
+            [role="option"]:hover,
+            [aria-selected="true"][role="option"] {
+                background: #dffff8 !important;
+            }
+
             .energy-hero {
                 position: relative;
                 overflow: hidden;
